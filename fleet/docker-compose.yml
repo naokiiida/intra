@@ -65,4 +65,5 @@ volumes:
   fleet:
 networks:
   fleet:
-  traefik_net:
+  traefik_global:
+    external: true

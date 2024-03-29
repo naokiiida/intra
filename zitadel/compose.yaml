@@ -86,10 +86,11 @@ services:
     networks:
       - "zitadel"
     volumes:
-      - "data:/var/lib/postgresql/data:rw"
+      - "zitadel_data:/var/lib/postgresql/data:rw"
 
 volumes:
-  data:
+  zitadel_data:
+    external: true
 
 networks:
   zitadel:
