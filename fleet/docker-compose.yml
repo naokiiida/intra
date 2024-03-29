@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:latest
+    command: "--default-authentication-plugin=mysql_native_password"
+    container_name: fleet_sql
+    volumes:
+      - mysql:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=fleet123
+      - MYSQL_DATABASE=fleet
+      - MYSQL_USER=fleet
+      - MYSQL_PASSWORD=fleet123
+    networks:
+      - "fleet"
+    # expose:
+    #   - 3306
+  redis:
+    image: docker.io/redis:latest
+    container_name: fleet_cache
+    volumes:
+      - redis:/data
+    # expose:
+    #   - 6379
+  fleet_oneshot:
+    image: "fleetdm/fleet:latest"
+    container_name: fleet_oneshot
+    command: "fleet prepare db"
+    restart: "no"
+    environment: &fleet_environment
+      - FLEET_MYSQL_ADDRESS=mysql:3306
+      - FLEET_MYSQL_DATABASE=fleet
+      - FLEET_MYSQL_USERNAME=root
+      - FLEET_MYSQL_PASSWORD=fleet123
+      - FLEET_REDIS_ADDRESS=redis:6379
+      - FLEET_SERVER_CERT=/fleet/server.cert
+      - FLEET_SERVER_KEY=/fleet/server.pem
+      - FLEET_OSQUERY_POLICY_UPDATE_INTERVAL=30s
+    networks:
+      - "fleet"
+  fleet:
+    image: "fleetdm/fleet:latest"
+    container_name: fleet
+    volumes:
+      - fleet:/fleet
+    environment: *fleet_environment
+    # ports:
+    #   - "9090:8080"
+    depends_on:
+      fleet_oneshot:
+        condition: service_completed_successfully
+    networks:
+      - "fleet"
+      - "traefik_net"
+    labels:
+      - traefik.http.routers.fleet.entrypoints=https
+      - traefik.http.routers.fleet.rule=Host(`fleet.taiida.com`)
+      - traefik.http.routers.fleet.tls.certresolver=letsencrypt
+      - traefik.http.routers.fleet.tls=true
+volumes:
+  mysql:
+  redis:
+  fleet:
+networks:
+  fleet:
+  traefik_net:

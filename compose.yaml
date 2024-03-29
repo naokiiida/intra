@@ -1,11 +1,8 @@
-
 networks:
   global:
 
 services:
-
   main:
-
     command:
       - --api=true
       - --api.dashboard=true
@@ -33,7 +30,7 @@ services:
       - CLOUDFLARE_DNS_API_TOKEN=${CF_API_TOKEN}
 
     hostname: ${HOST_NAME}
-
+    container_name: traefik
     image: ${TRAEFIK_IMAGE}
 
     labels:
