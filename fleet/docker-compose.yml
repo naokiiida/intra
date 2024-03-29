@@ -22,6 +22,8 @@ services:
     container_name: fleet_cache
     volumes:
       - redis:/data
+    networks:
+      - "fleet"
     # expose:
     #   - 6379
   fleet_oneshot:
@@ -53,7 +55,7 @@ services:
         condition: service_completed_successfully
     networks:
       - "fleet"
-      - "traefik_net"
+      - "traefik_global"
     labels:
       - traefik.http.routers.fleet.entrypoints=https
       - traefik.http.routers.fleet.rule=Host(`fleet.taiida.com`)
@@ -64,6 +66,6 @@ volumes:
   redis:
   fleet:
 networks:
-  fleet:
   traefik_global:
     external: true
+  fleet:
