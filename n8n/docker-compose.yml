@@ -8,8 +8,6 @@ services:
   postgres:
     image: postgres:16
     restart: always
-      services:
- postgres:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -24,6 +22,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - "n8n"
 
   n8n:
     image: docker.n8n.io/n8nio/n8n
@@ -44,3 +44,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    labels:
+      - traefik.http.routers.n8n.entrypoints=https
+      - traefik.http.routers.n8n.tls.certresolver=letsencrypt
+      - traefik.http.routers.n8n.rule=Host(`do.taiida.com`)
+    networks:
+      - "traefik_global"
+      - "n8n"
+
+networks:
+  traefik_global:
+    external: true
+  n8n:
