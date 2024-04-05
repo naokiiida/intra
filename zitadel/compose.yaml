@@ -31,15 +31,13 @@ services:
       - traefik.http.routers.zitadel.entrypoints=https
       - traefik.http.routers.zitadel.rule=Host(`zitadel.taiida.com`)
       - traefik.http.routers.zitadel.tls.certresolver=letsencrypt
-      - traefik.http.routers.zitadel.tls=true
       - "traefik.http.routers.zitadel.rule=PathPrefix(`/`)"
       - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
       - "traefik.http.services.zitadel.loadbalancer.server.scheme=h2c"
       - "traefik.http.services.zitadel.loadbalancer.server.url=zitadel-external-tls"
 
   zitadel-init:
-    user: "$UID"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
+    image: "ghcr.io/zitadel/zitadel:stable"
     command: "init"
     depends_on:
       db:
@@ -85,8 +83,8 @@ services:
       timeout: 60s
       retries: 10
       start_period: 5s
-    ports:
-      - "5432:5432"
+#    ports:
+#     - "5432:5432"
     networks:
       - "zitadel"
     volumes:
