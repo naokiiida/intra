@@ -1,3 +1,4 @@
+Source: https://github.com/eingress/docker-compose-traefik-letsencrypt-cloudflare
 # Docker Compose Traefik + Lets Encrypt + Cloudflare
 
   A docker compose configuration generator script for [Traefik](https://traefik.io/) with the [Lets Encrypt DNS-01 challenge](https://letsencrypt.org/docs/challenge-types/#dns-01-challenge) supported through [Cloudflare](cloudflare.com).
