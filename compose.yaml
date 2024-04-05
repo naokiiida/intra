@@ -20,8 +20,6 @@ services:
 
       - --providers.docker=true
 
-      # !!! IMPORTANT! Comment out or delete next line in production! !!!
-      - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
       - --log.level=DEBUG
     env_file:
       - ./.env
