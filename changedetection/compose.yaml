@@ -1,0 +1,23 @@
+services:
+  changedetection:
+    image: ghcr.io/dgtlmoon/changedetection.io
+    container_name: changedetection
+    hostname: changedetection
+    volumes:
+      - changedetection-data:/datastore
+        #    ports:
+        #      - 5000:5000
+    restart: unless-stopped
+    labels:
+      - traefik.http.routers.n8n.entrypoints=https
+      - traefik.http.routers.n8n.tls.certresolver=letsencrypt
+      - traefik.http.routers.n8n.rule=Host(`crawl.taiida.com`)
+    networks:
+      - "traefik_global"
+
+volumes:
+  changedetection-data:
+
+networks:
+  traefik_global:
+    external: true
