@@ -19,6 +19,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.asDefault=true
       - --entrypoints.websecure.http.tls.certresolver=letsencrypt
+      - --providers.docker.exposedByDefault=false
       - --providers.docker=true
 
       - --log.level=DEBUG
@@ -33,6 +34,7 @@ services:
     image: ${TRAEFIK_IMAGE}
 
     labels:
+      - traefik.enable=true
       - traefik.http.middlewares.auth.basicauth.usersFile=/etc/traefik/.htpasswd
       - traefik.http.routers.traefik.middlewares=auth
       - traefik.http.routers.traefik.rule=Host(`${HOST_NAME}`)

@@ -13,6 +13,7 @@ services:
         playwright-chrome:
             condition: service_started
     labels:
+      - traefik.enable=true
       - traefik.http.routers.crawl.rule=Host(`crawl.taiida.com`)
     networks:
       - detect

@@ -47,6 +47,7 @@ services:
       postgres:
         condition: service_healthy
     labels:
+      - traefik.enable=true
       - traefik.http.routers.n8n.rule=Host(`do.taiida.com`)
     networks:
       - "traefik_global"
