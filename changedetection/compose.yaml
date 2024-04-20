@@ -5,15 +5,34 @@ services:
     hostname: changedetection
     volumes:
       - changedetection-data:/datastore
-        #    ports:
-        #      - 5000:5000
     restart: unless-stopped
+    environment:
+        - PLAYWRIGHT_DRIVER_URL=ws://playwright-chrome:3000
+        - USE_X_SETTINGS=1
+    depends_on:
+        playwright-chrome:
+            condition: service_started
     labels:
       - traefik.http.routers.crawl.entrypoints=https
       - traefik.http.routers.crawl.tls.certresolver=letsencrypt
       - traefik.http.routers.crawl.rule=Host(`crawl.taiida.com`)
     networks:
-      - "traefik_global"
+      - detect
+      - traefik_global
+
+  playwright-chrome:
+    hostname: playwright-chrome
+    image: dgtlmoon/sockpuppetbrowser:latest
+    cap_add:
+      - SYS_ADMIN
+    restart: unless-stopped
+    environment:
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1024
+      - SCREEN_DEPTH=16
+      - MAX_CONCURRENT_CHROME_PROCESSES=10
+    networks:
+      - detect
 
 volumes:
   changedetection-data:
@@ -21,3 +40,4 @@ volumes:
 networks:
   traefik_global:
     external: true
+  detect:
