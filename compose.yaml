@@ -11,13 +11,14 @@ services:
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
       - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
-
       - --certificatesresolvers.letsencrypt.acme.email=${CF_API_EMAIL}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
-
-      - --entrypoints.http.address=:80
-      - --entrypoints.https.address=:443
-
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entryPoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.asDefault=true
+      - --entrypoints.websecure.http.tls.certresolver=letsencrypt
       - --providers.docker=true
 
       - --log.level=DEBUG
@@ -33,18 +34,9 @@ services:
 
     labels:
       - traefik.http.middlewares.auth.basicauth.usersFile=/etc/traefik/.htpasswd
-      - traefik.http.middlewares.to-https.redirectscheme.scheme=https
-
-      - traefik.http.routers.to-https.entrypoints=http
-      - traefik.http.routers.to-https.middlewares=to-https
-      - traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)
-
-      - traefik.http.routers.traefik.entrypoints=https
       - traefik.http.routers.traefik.middlewares=auth
       - traefik.http.routers.traefik.rule=Host(`${HOST_NAME}`)
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.tls.certresolver=letsencrypt
-      - traefik.http.routers.traefik.tls=true
 
     networks:
       - global
