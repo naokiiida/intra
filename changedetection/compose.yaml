@@ -13,8 +13,6 @@ services:
         playwright-chrome:
             condition: service_started
     labels:
-      - traefik.http.routers.crawl.entrypoints=https
-      - traefik.http.routers.crawl.tls.certresolver=letsencrypt
       - traefik.http.routers.crawl.rule=Host(`crawl.taiida.com`)
     networks:
       - detect
