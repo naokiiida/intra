@@ -6,20 +6,20 @@ services:
     networks:
       - "traefik_global"
     environment:
-      WEBSOCKET_ENABLED: true  # Enable WebSocket notifications.
       DOMAIN: "https://bitwarden.taiida.com"
+      SHOW_PASSWORD_HINT: false
+      SIGNUPS_ALLOWED: false
+      # ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+      PUSH_ENABLED: true
+      PUSH_INSTALLATION_ID: ${PUSH_ID}
+      PUSH_INSTALLATION_KEY: ${PUSH_KEY}
     volumes:
       - /home/digital/Documents/vaultwarden/data:/data:Z
     labels:
       - traefik.enable=true
-      #- traefik.http.routers.bitwarden-ui.entrypoints=https
-      #- traefik.http.routers.bitwarden-ui.tls.certresolver=letsencrypt
-      - traefik.http.routers.bitwarden-ui.rule=Host(`bitwarden.taiida.com`)
-      - traefik.http.routers.bitwarden-ui.service=bitwarden-ui
-      - traefik.http.services.bitwarden-ui.loadbalancer.server.port=80
-      - traefik.http.routers.bitwarden-websocket.rule=Host(`bitwarden.taiida.com`) && Path(`/notifications/hub`)
-      - traefik.http.routers.bitwarden-websocket.service=bitwarden-websocket
-      - traefik.http.services.bitwarden-websocket.loadbalancer.server.port=3012
+      - traefik.http.routers.bitwarden.rule=Host(`bitwarden.taiida.com`)
+      - traefik.http.routers.bitwarden.service=bitwarden
+      - traefik.http.services.bitwarden.loadbalancer.server.port=80
 
 networks:
   traefik_global:
