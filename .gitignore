@@ -1,3 +1,4 @@
 .env
 .htpasswd
 compose.yml
+.DS_Store

@@ -2,13 +2,13 @@ version: "3.8"
 
 services:
   zitadel-external-tls:
-    extends:
-      service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters"'
+    image: "ghcr.io/zitadel/zitadel:stable"
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
+      - ZITADEL_EXTERNALDOMAIN=zitadel.taiida.com
       - ZITADEL_EXTERNALPORT=443
       - ZITADEL_EXTERNALSECURE=true
-      - ZITADEL_TLS_ENABLED=false
+      - ZITADEL_TLS_ENABLED=external
       # database configuration
       - ZITADEL_DATABASE_POSTGRES_HOST=db
       - ZITADEL_DATABASE_POSTGRES_PORT=5432
@@ -19,6 +19,7 @@ services:
       - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
       - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
       - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+      - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
     networks:
       - "zitadel"
       - "traefik_global"
@@ -28,42 +29,13 @@ services:
     hostname: zitadel.taiida.com
     container_name: zitadel
     labels:
-      - traefik.http.routers.zitadel.entrypoints=https
+      - traefik.enable=true
       - traefik.http.routers.zitadel.rule=Host(`zitadel.taiida.com`)
-      - traefik.http.routers.zitadel.tls.certresolver=letsencrypt
       - "traefik.http.routers.zitadel.rule=PathPrefix(`/`)"
+      - traefik.http.routers.zitadel.service=zitadel
       - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
       - "traefik.http.services.zitadel.loadbalancer.server.scheme=h2c"
       - "traefik.http.services.zitadel.loadbalancer.server.url=zitadel-external-tls"
-
-  zitadel-init:
-    image: "ghcr.io/zitadel/zitadel:stable"
-    command: "init"
-    depends_on:
-      db:
-        condition: "service_healthy"
-    environment:
-      # Using an external domain other than localhost proofs, that the proxy configuration works.
-      # If ZITADEL can't resolve a requests original host to this domain,
-      # it will return a 404 Instance not found error.
-      - ZITADEL_EXTERNALDOMAIN=zitadel.taiida.com
-      # In case something doesn't work as expected,
-      # it can be handy to be able to read the access logs.
-      - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
-      # For convenience, ZITADEL should not ask to change the initial admin users password.
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=false
-      # database configuration
-      - ZITADEL_DATABASE_POSTGRES_HOST=db
-      - ZITADEL_DATABASE_POSTGRES_PORT=5432
-      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
-      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
-    networks:
-      - "zitadel"
     healthcheck:
       test: ["CMD", "/app/zitadel", "ready"]
       interval: "10s"
@@ -92,7 +64,7 @@ services:
 
 volumes:
   zitadel_data:
-    external: true
+    #    external: true
 
 networks:
   zitadel:

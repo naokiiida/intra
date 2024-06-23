@@ -57,10 +57,9 @@ services:
       - "fleet"
       - "traefik_global"
     labels:
-      - traefik.http.routers.fleet.entrypoints=https
+      - traefik.enable=true
+      - traefik.http.routers.fleet.service=fleet
       - traefik.http.routers.fleet.rule=Host(`fleet.taiida.com`)
-      - traefik.http.routers.fleet.tls.certresolver=letsencrypt
-      - traefik.http.routers.fleet.tls=true
 volumes:
   mysql:
   redis:
