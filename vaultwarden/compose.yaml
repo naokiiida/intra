@@ -14,7 +14,7 @@ services:
       PUSH_INSTALLATION_ID: ${PUSH_ID}
       PUSH_INSTALLATION_KEY: ${PUSH_KEY}
     volumes:
-      - /home/digital/Documents/vaultwarden/data:/data:Z
+      - vaultwarden-data:/data/
     labels:
       - traefik.enable=true
       - traefik.http.routers.bitwarden.rule=Host(`bitwarden.taiida.com`)
@@ -42,18 +42,16 @@ services:
     #   MAIL_WHEN_FAILURE: 'TRUE'
     #   TIMEZONE: 'UTC'
     volumes:
-      - /home/digital/Documents/vaultwarden/data:/bitwarden/data/
-      # - vaultwarden-data:/bitwarden/data/
-      # - /home/digital/Documents/traefik/vaultwarden/config:/config/
+      - vaultwarden-data:/bitwarden/data/
       - vaultwarden-rclone-data:/config/
     #   - /path/to/env:/.env
 
 volumes:
-  vaultwarden-data:
-    name: vaultwarden-data
   vaultwarden-rclone-data:
     external: true
     name: vaultwarden-rclone-data
+  vaultwarden-data:
+    name: vaultwarden-data
 
 networks:
   traefik_global:

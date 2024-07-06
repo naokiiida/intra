@@ -2,3 +2,4 @@
 .htpasswd
 compose.yml
 .DS_Store
+vaultwarden/config/
