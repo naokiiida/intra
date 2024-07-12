@@ -1,35 +1,42 @@
 services:
   miniflux:
     image: ghcr.io/miniflux/miniflux:latest
+    container_name: miniflux
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - DATABASE_URL=postgres://miniflux:secret@db/miniflux?sslmode=disable
+      - DATABASE_URL=postgres://${PG_USER}:${PG_PASS}@db:5432/${PG_DB}?sslmode=disable
       - RUN_MIGRATIONS=1
       - CREATE_ADMIN=1
-      - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=test123
+      - ADMIN_USERNAME=${MINIFLUX_ADMIN}
+      - ADMIN_PASSWORD=${MINIFLUX_ADMIN_PASS}
+      - BASE_URL=${MINIFLUX_DOMAIN}
     networks:
       - traefik_global
+      - miniflux
     labels:
-      - traefik.http.routers.miniflux.rule=Host(`miniflux.taiida.com`)
+      - traefik.enable=true
+      - traefik.http.routers.miniflux.rule=Host(`${MINIFLUX_HOST}`)
       - traefik.http.routers.miniflux.service=miniflux
       - traefik.http.services.miniflux.loadbalancer.server.port=8080
   db:
     image: postgres:15
     environment:
-      - POSTGRES_USER=miniflux
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=miniflux
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASS}
+      - POSTGRES_DB=${PG_DB}
     volumes:
       - miniflux-db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "miniflux"]
+      test: ["CMD", "pg_isready", "-U", "${PG_USER}"]
       interval: 10s
       start_period: 30s
+    networks:
+      - miniflux
 volumes:
   miniflux-db:
 networks:
   traefik_global:
     external: true  
+  miniflux:
