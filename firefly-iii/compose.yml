@@ -1,3 +1,9 @@
+# The Firefly III Data Importer will ask you for the Firefly III URL and a "Client ID".
+# You can generate the Client ID at http://localhost/profile (after registering)
+# The Firefly III URL is: http://app:8080
+#
+# Other URL's will give 500 | Server Error
+#
 services:
   app:
     image: fireflyiii/core:latest
@@ -9,8 +15,10 @@ services:
     env_file: .env
     networks:
       - firefly_iii
-    ports:
-      - 80:8080
+      - traefik_global
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app.rule=Host(`${FIREFLY_HOST}`)
     depends_on:
       - db
   db:
@@ -23,6 +31,20 @@ services:
       - firefly_iii
     volumes:
       - firefly_iii_db:/var/lib/mysql
+  importer:
+    image: fireflyiii/data-importer:latest
+    hostname: importer
+    restart: always
+    container_name: firefly_iii_importer
+    networks:
+      - firefly_iii
+      - traefik_global
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.importer.rule=Host(`${IMPORTER_HOST}`)
+    depends_on:
+      - app
+    env_file: .importer.env
   cron:
     #
     # To make this work, set STATIC_CRON_TOKEN in your .env file or as an environment variable and replace REPLACEME below
@@ -31,7 +53,7 @@ services:
     image: alpine
     restart: always
     container_name: firefly_iii_cron
-    command: sh -c "echo \"0 3 * * * wget -qO- http://app:8080/api/v1/cron/REPLACEME\" | crontab - && crond -f -L /dev/stdout"
+    command: sh -c "echo \"0 3 * * * wget -qO- http://app:8080/api/v1/cron/${STATIC_CRON_TOKEN}\" | crontab - && crond -f -L /dev/stdout"
     networks:
       - firefly_iii
 
@@ -40,5 +62,7 @@ volumes:
    firefly_iii_db:
 
 networks:
+  traefik_global:
+    external: true
   firefly_iii:
     driver: bridge
