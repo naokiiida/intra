@@ -22,8 +22,11 @@ services:
       - --certificatesresolvers.myresolver.acme.keyType=EC256
       - --providers.docker.exposedByDefault=false
       - --providers.docker=true
-
-      - --log.level=DEBUG
+      - --metrics.prometheus=true
+      # - --log.level=DEBUG
+      - --log.level=INFO
+      - --accesslog.filepath=/var/log/access.log
+      - --accesslog.filters.statuscodes=400-499
     env_file:
       - ./.env
 
@@ -47,11 +50,13 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 8082:8080
 
     restart: unless-stopped
 
     volumes:
       - .htpasswd:/etc/traefik/.htpasswd
+      - /var/log/traefik:/var/log
       - "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro"
 
       - acme:/letsencrypt
