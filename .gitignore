@@ -1,4 +1,4 @@
-.env
+*.env
 .htpasswd
 .DS_Store
 vaultwarden/config/

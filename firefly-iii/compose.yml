@@ -38,10 +38,12 @@ services:
     container_name: firefly_iii_importer
     networks:
       - firefly_iii
-      - traefik_global
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.importer.rule=Host(`${IMPORTER_HOST}`)
+      # - traefik_global
+    # labels:
+      # - traefik.enable=true
+      # - traefik.http.routers.importer.rule=Host(`${IMPORTER_HOST}`)
+    ports:
+      - 81:8080
     depends_on:
       - app
     env_file: .importer.env
