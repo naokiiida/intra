@@ -3,25 +3,26 @@ services:
     image: cortezaproject/corteza:${VERSION}
     networks:
       - internal
-      - traefik_global
+      # - traefik_global
     restart: always
     env_file: [ .env ]
-    # ports: [ "0.0.0.0:18080:80" ]
+    ports:
+      - 18080:80
     depends_on:
       db:
         condition: service_healthy
     volumes: [ "server:/data" ]
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.corteza.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.corteza.service=corteza
-      - traefik.http.services.corteza.loadbalancer.server.port=80
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.corteza.rule=Host(`${DOMAIN}`)
+    #   - traefik.http.routers.corteza.service=corteza
+    #   - traefik.http.services.corteza.loadbalancer.server.port=80
     environment:
       # VIRTUAL_HOST helps NginX proxy route traffic for specific virtual host to
       # this container
       # This value is also picked up by initial boot auto-configuration procedure
       # If this is changed, make sure you change settings accordingly
-      VIRTUAL_HOST: ${DOMAIN}
+      # VIRTUAL_HOST: ${DOMAIN}
       # This is needed only if you are using NginX Lets-Encrypt companion
       # (see docs.cortezaproject.org for details)
       # LETSENCRYPT_HOST: ${DOMAIN}
