@@ -1,0 +1,21 @@
+services:
+  semaphore:
+    image: semaphoreui/semaphore:v2.10.22
+    container_name: semaphore
+    environment:
+      - SEMAPHORE_DB_DIALECT=bolt
+      - SEMAPHORE_ADMIN=${ADMIN}
+      - SEMAPHORE_ADMIN_PASSWORD=${ADMIN_PASS}
+      - SEMAPHORE_ADMIN_NAME=${ADMIN_NAME}
+      - SEMAPHORE_ADMIN_EMAIL=${ADMIN_EMAIL}
+    networks:
+      - traefik_global
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.semaphore.rule=Host(`${SEMAPHORE_HOST}`)
+      - traefik.http.routers.semaphore.service=semaphore
+      - traefik.http.services.semaphore.loadbalancer.server.port=3000
+
+networks:
+  traefik_global:
+    external: true
