@@ -1,0 +1,51 @@
+services:
+  freshrss:
+   image: docker.io/freshrss/freshrss:latest
+   container_name: freshrss
+   hostname: freshrss
+   restart: unless-stopped
+   logging:
+     options:
+       max-size: 10m
+   volumes:
+     - data:/var/www/FreshRSS/data
+     - extensions:/var/www/FreshRSS/extensions
+   environment:
+     TZ: $TZ
+     CRON_MIN: '8,38'
+   labels:
+     - traefik.enable=true
+     - traefik.http.routers.freshrss-hms-docker.rule=Host(`${RSS_HOST}`)
+   networks:
+     - traefik_global
+     - freshrss
+  freshrss-postgresql:
+   image: docker.io/postgres:15
+   restart: unless-stopped
+   container_name: freshrss-postgresql
+   healthcheck:
+     test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+     start_period: 20s
+     interval: 30s
+     retries: 5
+     timeout: 5s
+   volumes:
+     - pgsql:/var/lib/postgresql/data
+   env_file:
+     - .env
+   environment:
+     POSTGRES_PASSWORD: ${FR_PASS?database password required}
+     POSTGRES_USER: ${FR_USER:-freshrss}
+     POSTGRES_DB: ${FR_DB:-freshrss}
+   networks:
+     - freshrss
+
+volumes:
+  data:
+  extensions:
+  pgsql:
+
+networks:
+  traefik_global:
+    external: true
+  freshrss:
