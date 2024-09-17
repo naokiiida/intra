@@ -1,0 +1,208 @@
+Services:
+  immich-server:
+    container_name: immich_server
+    image: altran1502/immich-server:release
+    entrypoint: [ "/bin/sh", "./start-server.sh" ]
+    networks:
+      - traefik_net
+      - immich
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.media-immich-api.loadbalancer.server.port: "3001"
+      traefik.http.routers.media-immich-api.rule: "Host(`immich.$DOMAINNAME`) && Pathprefix(`/api`)"
+      traefik.http.routers.media-immich-api.middlewares: service-immich-api-strip
+      traefik.http.middlewares.service-immich-api-strip.stripprefix.prefixes: "/api"
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - immich_redis
+      - immich_db
+    restart: always
+
+  immich-microservices:
+    container_name: immich_microservices
+    image: altran1502/immich-server:release
+    entrypoint: [ "/bin/sh", "./start-microservices.sh" ]
+    networks:
+      - immich
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - immich_redis
+      - immich_db
+    restart: always
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: altran1502/immich-machine-learning:releas
+    networks:
+      - immich
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - model-cache:/cache
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    restart: always
+
+  immich-web:
+    container_name: immich_web
+    image: altran1502/immich-web:release
+    entrypoint: [ "/bin/sh", "./entrypoint.sh" ]
+    env_file:
+      - .env
+    networks:
+      - traefik_net
+      - immich
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.media-immich.loadbalancer.server.port: "3000"
+      traefik.http.routers.media-immich.rule: "Host(`immich.$DOMAINNAME`)"
+      traefik.http.routers.media-immich.entrypoints: https
+    restart: always
+
+  immich_redis:
+    container_name: immich_redis
+    image: redis:6.2
+    networks:
+      - immich
+    restart: always
+
+  immich_db:
+    container_name: immich_postgres
+    image: postgres:14
+    networks:
+      - immich
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: ${IMG_PASS}
+      POSTGRES_USER: ${IMG_USER}
+      POSTGRES_DB: ${IMG_DB}
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - immich_database:/var/lib/postgresql/data
+    restart: always
+
+#immich
+  immich-server:
+    container_name: immich_server
+    image: altran1502/immich-server:release
+    entrypoint: [ "/bin/sh", "./start-server.sh" ]
+    networks:
+      - traefik_net
+      - immich
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.media-immich-api.loadbalancer.server.port: "3001"
+      traefik.http.routers.media-immich-api.rule: "Host(`immich.$DOMAINNAME`) && Pathprefix(`/api`)"
+      traefik.http.routers.media-immich-api.middlewares: service-immich-api-strip
+      traefik.http.middlewares.service-immich-api-strip.stripprefix.prefixes: "/api"
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - immich_redis
+      - immich_db
+    restart: always
+
+  immich-microservices:
+    container_name: immich_microservices
+    image: altran1502/immich-server:release
+    entrypoint: [ "/bin/sh", "./start-microservices.sh" ]
+    networks:
+      - immich
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - immich_redis
+      - immich_db
+    restart: always
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: altran1502/immich-machine-learning:releas
+    networks:
+      - immich
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - model-cache:/cache
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    restart: always
+
+  immich-web:
+    container_name: immich_web
+    image: altran1502/immich-web:release
+    entrypoint: [ "/bin/sh", "./entrypoint.sh" ]
+    env_file:
+      - .env
+    networks:
+      - traefik_net
+      - immich
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.media-immich.loadbalancer.server.port: "3000"
+      traefik.http.routers.media-immich.rule: "Host(`immich.$DOMAINNAME`)"
+      traefik.http.routers.media-immich.entrypoints: https
+    restart: always
+
+  immich_redis:
+    container_name: immich_redis
+    image: redis:6.2
+    networks:
+      - immich
+    restart: always
+
+  immich_db:
+    container_name: immich_postgres
+    image: postgres:14
+    networks:
+      - immich
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: ${IMG_PASS}
+      POSTGRES_USER: ${IMG_USER}
+      POSTGRES_DB: ${IMG_DB}
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - immich_database:/var/lib/postgresql/data
+    restart: always
+
+#devices
+volumes:
+  authentik_database:
+    driver: local
+  freshrss_database:
+    driver: local
+  immich_database:
+    driver: local
+  model-cache:
+
+networks:
+  download_net:
+  freshrss_net:
+    driver: bridge
+    attachable: false
+  immich:
+    driver: bridge
+    attachable: false
