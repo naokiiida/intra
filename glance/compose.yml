@@ -1,0 +1,17 @@
+services:
+  glance:
+    image: glanceapp/glance
+    container_name: glance
+    volumes:
+      - ./glance.yml:/app/glance.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.glance.rule=Host(`${GLANCE_HOST}`)
+    networks:
+      - traefik_global
+networks:
+  traefik_global:
+    external: true
