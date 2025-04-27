@@ -1,0 +1,27 @@
+[Unit]
+Description=Audiobookshelf Media Server
+After=network.target
+
+[Container]
+Image=ghcr.io/advplyr/audiobookshelf
+AutoUpdate=registry
+NoNewPrivileges=true
+PublishPort=13378:80/tcp
+Volume=/path/to/config:/config:rw
+Volume=/path/to/metadata:/metadata:rw
+Volume=/path/to/audiobooks:/audiobooks:rw
+Volume=/path/to/books:/books:rw
+Volume=/path/to/podcasts:/podcasts:rw
+Timezone=Japan
+
+[Service]
+Restart=always
+# Uncomment and adjust if you want to specify a specific user
+# User=youruser
+# Group=yourgroup
+# UMask=0002
+# SuccessExitStatus=0 143
+
+[Install]
+WantedBy=default.target
+
