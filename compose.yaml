@@ -1,5 +1,10 @@
 networks:
   global:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:db8::/64
 
 services:
   main:
@@ -18,6 +23,7 @@ services:
       - --entryPoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.asDefault=true
+      - --entrypoints.websecure.http3=true
       - --entrypoints.websecure.http.tls.certresolver=letsencrypt
       - --certificatesresolvers.letsencrypt.acme.keyType=EC256
       - --providers.docker.exposedByDefault=false
@@ -39,8 +45,8 @@ services:
 
     labels:
       - traefik.enable=true
-      - traefik.http.middlewares.auth.basicauth.usersFile=/etc/traefik/.htpasswd
-      - traefik.http.routers.traefik.middlewares=auth
+      # - traefik.http.middlewares.auth.basicauth.usersFile=/etc/traefik/.htpasswd
+      # - traefik.http.routers.traefik.middlewares=auth
       - traefik.http.routers.traefik.rule=Host(`${HOST_NAME}`)
       - traefik.http.routers.traefik.service=api@internal
 
@@ -50,15 +56,16 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8082:8080
+      - 443:443/udp
+      # - 8082:8080
 
     restart: unless-stopped
 
     volumes:
-      - .htpasswd:/etc/traefik/.htpasswd
+      # - .htpasswd:/etc/traefik/.htpasswd
       - /var/log/traefik:/var/log
-      - "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro"
-
+      # - "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro"
+      - /var/run/docker.sock:/var/run/docker.sock
       - acme:/letsencrypt
 
     security_opt:
