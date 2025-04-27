@@ -1,0 +1,16 @@
+services:
+  # Cloudflare-Companion - Automatic CNAME DNS Creation
+  cf-companion:
+    container_name: cf-companion
+    image: docker.io/tiredofit/traefik-cloudflare-companion:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/podman.sock:/var/run/docker.sock:ro
+    environment:
+      - TIMEZONE=$TZ
+      - TRAEFIK_VERSION=2
+      - CF_TOKEN=$CLOUDFLARE_API_TOKEN
+      - TARGET_DOMAIN=$DOMAINNAME
+      - DOMAIN1=$DOMAINNAME
+      - DOMAIN1_ZONE_ID=$CLOUDFLARE_ZONEID
+      - DOMAIN1_PROXIED=TRUE
