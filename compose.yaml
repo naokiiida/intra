@@ -12,10 +12,12 @@ services:
       - --api=true
       - --api.dashboard=true
 
-      - --certificatesresolvers.letsencrypt.acme.dnschallenge.delaybeforecheck=0
-      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
-      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
-      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+            
+      # - --certificatesresolvers.letsencrypt.acme.dnschallenge.delaybeforecheck=0
+      # - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
+      # - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
+      # - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt.acme.email=${CF_API_EMAIL}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --entrypoints.web.address=:80
@@ -29,8 +31,8 @@ services:
       - --providers.docker.exposedByDefault=false
       - --providers.docker=true
       - --metrics.prometheus=true
-      # - --log.level=DEBUG
-      - --log.level=INFO
+      - --log.level=DEBUG
+      # - --log.level=INFO
       - --accesslog.filepath=/var/log/access.log
       - --accesslog.filters.statuscodes=400-499
     env_file:
@@ -57,7 +59,6 @@ services:
       - 80:80
       - 443:443
       - 443:443/udp
-      # - 8082:8080
 
     restart: unless-stopped
 

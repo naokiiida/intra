@@ -17,17 +17,20 @@ services:
       - miniflux
     labels:
       - traefik.enable=true
+      - traefik.docker.network=traefik_global
       - traefik.http.routers.miniflux.rule=Host(`${MINIFLUX_HOST}`)
       - traefik.http.routers.miniflux.service=miniflux
       - traefik.http.services.miniflux.loadbalancer.server.port=8080
   db:
-    image: postgres:15
+    image: postgres:17
+    container_name: miniflux_db
     environment:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASS}
       - POSTGRES_DB=${PG_DB}
     volumes:
-      - miniflux-db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
+      - /home/naokiiida/volumes/miniflux_miniflux-db:/pg15
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${PG_USER}"]
       interval: 10s
@@ -35,7 +38,7 @@ services:
     networks:
       - miniflux
 volumes:
-  miniflux-db:
+  db:
 networks:
   traefik_global:
     external: true  

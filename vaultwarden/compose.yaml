@@ -9,16 +9,17 @@ services:
       DOMAIN: ${VAULT_DOMAIN}
       SHOW_PASSWORD_HINT: false
       SIGNUPS_ALLOWED: false
-      # ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
       PUSH_ENABLED: true
       PUSH_INSTALLATION_ID: ${PUSH_ID}
       PUSH_INSTALLATION_KEY: ${PUSH_KEY}
       LOG_FILE: /data/vaultwarden.log
-      # TZ: Japan
+      TZ: Japan
     volumes:
       - vaultwarden-data:/data/
     labels:
       - traefik.enable=true
+      - traefik.docker.network=traefik_global
       - traefik.http.routers.bitwarden.rule=Host(`${VAULT_HOST}`)
       - traefik.http.routers.bitwarden.service=bitwarden
       - traefik.http.services.bitwarden.loadbalancer.server.port=80
