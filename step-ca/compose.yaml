@@ -1,0 +1,26 @@
+services:
+  step-ca:
+    image: docker.io/smallstep/step-ca:latest
+    container_name: step-ca
+    restart: unless-stopped
+    networks:
+      - "traefik_global"
+    environment:
+      - DOCKER_STEPCA_INIT_NAME=${NAME}
+      - DOCKER_STEPCA_INIT_DNS_NAMES=${STEP_HOST}
+      - DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT=true
+      - TZ=Japan
+    volumes:
+      - step:/home/step
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_global
+      - traefik.http.routers.step-ca.rule=Host(`${STEP_HOST}`)
+      - traefik.http.services.step-ca.loadbalancer.server.port=9000
+
+volumes:
+  step:
+    name: step
+networks:
+  traefik_global:
+    external: true
