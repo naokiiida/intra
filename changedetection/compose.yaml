@@ -14,14 +14,16 @@ services:
             condition: service_started
     labels:
       - traefik.enable=true
+      - traefik.docker.network=traefik_global
       - traefik.http.routers.crawl.rule=Host(`crawl.taiida.com`)
+      - traefik.http.services.crawl.loadbalancer.server.port=5000
     networks:
       - detect
       - traefik_global
 
   playwright-chrome:
     hostname: playwright-chrome
-    image: dgtlmoon/sockpuppetbrowser:latest
+    image: docker.io/dgtlmoon/sockpuppetbrowser:latest
     cap_add:
       - SYS_ADMIN
     restart: unless-stopped

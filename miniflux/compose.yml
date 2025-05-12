@@ -13,8 +13,10 @@ services:
       - ADMIN_PASSWORD=${MINIFLUX_ADMIN_PASS}
       - BASE_URL=${MINIFLUX_DOMAIN}
     networks:
-      - traefik_global
       - miniflux
+      - traefik_global
+    # ports:
+    #  - 127.0.0.1:8080:8080
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_global
@@ -30,7 +32,7 @@ services:
       - POSTGRES_DB=${PG_DB}
     volumes:
       - db:/var/lib/postgresql/data
-      - /home/naokiiida/volumes/miniflux_miniflux-db:/pg15
+      # - /home/naokiiida/volumes/miniflux_miniflux-db:/pg15
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${PG_USER}"]
       interval: 10s
@@ -40,6 +42,6 @@ services:
 volumes:
   db:
 networks:
+  miniflux:
   traefik_global:
     external: true  
-  miniflux:

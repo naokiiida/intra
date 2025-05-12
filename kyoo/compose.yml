@@ -1,5 +1,5 @@
 x-transcoder: &transcoder-base
-  image: ghcr.io/zoriya/kyoo_transcoder:4.7
+  image: ghcr.io/zoriya/kyoo_transcoder:${RELEASE}
   networks:
     default:
       aliases:
@@ -16,7 +16,7 @@ x-transcoder: &transcoder-base
 
 services:
   back:
-    image: ghcr.io/zoriya/kyoo_back:edge
+    image: ghcr.io/zoriya/kyoo_back:${RELEASE}
     restart: unless-stopped
     cpus: 1.5
     environment:
@@ -36,6 +36,7 @@ services:
       - kyoo:/metadata
     networks:
       - "kyoo"
+      - traefik_global
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=PathPrefix(`/api/`)"
@@ -44,7 +45,7 @@ services:
       - "traefik.http.middlewares.api-sp.stripprefix.forceSlash=false"
 
   migrations:
-    image: ghcr.io/zoriya/kyoo_migrations:edge
+    image: ghcr.io/zoriya/kyoo_migrations:${RELEASE}
     restart: "no"
     depends_on:
       postgres:
@@ -53,7 +54,7 @@ services:
       - ./.env
 
   front:
-    image: ghcr.io/zoriya/kyoo_front:edge
+    image: ghcr.io/zoriya/kyoo_front:${RELEASE}
     restart: unless-stopped
     environment:
       - KYOO_URL=${KYOO_URL:-http://back:5000}
@@ -64,7 +65,7 @@ services:
       - "traefik.http.routers.front.rule=PathPrefix(`/`)"
 
   scanner:
-    image: ghcr.io/zoriya/kyoo_scanner:edge
+    image: ghcr.io/zoriya/kyoo_scanner:${RELEASE}
     restart: unless-stopped
     depends_on:
       back:
@@ -77,7 +78,7 @@ services:
       - ${LIBRARY_ROOT}:/video:ro
 
   matcher:
-    image: ghcr.io/zoriya/kyoo_scanner:edge
+    image: ghcr.io/zoriya/kyoo_scanner:${RELEASE}
     command: matcher
     restart: unless-stopped
     depends_on:
@@ -89,7 +90,7 @@ services:
       - KYOO_URL=${KYOO_URL:-http://back:5000}
 
   autosync:
-    image: ghcr.io/zoriya/kyoo_autosync:edge
+    image: ghcr.io/zoriya/kyoo_autosync:${RELEASE}
     restart: on-failure
     depends_on:
       rabbitmq:
@@ -133,18 +134,18 @@ services:
       - GOCODER_VAAPI_RENDERER=${GOCODER_VAAPI_RENDERER:-/dev/dri/renderD128}
     profiles: ['qsv']
 
-  traefik:
-    image: traefik:v3.2
-    restart: unless-stopped
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.web.address=:8901"
-      - "--accesslog=true"
-    ports:
-      - "8901:8901"
-    volumes:
-      - "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro"
+  # traefik:
+  #   image: traefik:v3.2
+  #   restart: unless-stopped
+  #   command:
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entryPoints.web.address=:8901"
+  #     - "--accesslog=true"
+  #   ports:
+  #     - "8901:8901"
+  #   volumes:
+  #     - "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro"
 
   postgres:
     image: postgres:15
@@ -158,6 +159,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - "kyoo"
 
   meilisearch:
     image: getmeili/meilisearch:v1.4
@@ -173,6 +176,8 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+    networks:
+      - "kyoo"
 
   rabbitmq:
     image: rabbitmq:4-alpine
@@ -186,6 +191,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    networks:
+      - "kyoo"
 
 volumes:
   kyoo:
@@ -195,4 +202,5 @@ volumes:
 
 networks:
   kyoo:
+  traefik_global:
     external: true
