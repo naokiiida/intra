@@ -1,0 +1,27 @@
+[Unit]
+Description=Karakeep Meilisearch Service
+Wants=karakeep.pod
+After=karakeep.pod
+
+[Container]
+# Use the Meilisearch image
+Image=getmeili/meilisearch:v1.13.3
+
+# Set container name
+ContainerName=karakeep-meilisearch
+
+# Environment variables
+Environment=MEILI_NO_ANALYTICS=true
+
+# Volumes
+Volume=/var/lib/meilisearch/data:/meili_data
+
+# Add to the pod
+Pod=karakeep-pod
+
+[Service]
+# Restart policy
+Restart=unless-stopped
+
+[Install]
+WantedBy=karakeep.pod

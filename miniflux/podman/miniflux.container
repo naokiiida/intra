@@ -1,0 +1,39 @@
+[Unit]
+Description=Miniflux RSS Reader
+Wants=miniflux.pod db.container
+After=miniflux.pod db.container
+
+[Container]
+# Use the latest Miniflux image
+Image=ghcr.io/miniflux/miniflux:latest
+
+# Set container name
+ContainerName=miniflux
+
+# Environment variables from environment file
+EnvironmentFile=/etc/miniflux/miniflux.env
+Environment=DATABASE_URL=postgres://${PG_USER}:${PG_PASS}@localhost:5432/${PG_DB}?sslmode=disable
+Environment=RUN_MIGRATIONS=1
+Environment=CREATE_ADMIN=1
+Environment=ADMIN_USERNAME=${MINIFLUX_ADMIN}
+Environment=ADMIN_PASSWORD=${MINIFLUX_ADMIN_PASS}
+Environment=BASE_URL=${MINIFLUX_DOMAIN}
+
+# Health check
+HealthCmd=/usr/bin/curl --fail http://localhost:8080/healthcheck || exit 1
+HealthInterval=30s
+HealthStartupPeriod=30s
+
+# Add to the pod
+Pod=miniflux-pod
+
+# Publish port 8080 to localhost
+PublishPort=127.0.0.1:8080:8080
+
+[Service]
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=miniflux.pod

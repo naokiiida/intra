@@ -1,0 +1,33 @@
+[Unit]
+Description=Karakeep Web Service
+Wants=karakeep.pod meilisearch.container
+After=karakeep.pod meilisearch.container
+
+[Container]
+# Use the Karakeep image
+Image=ghcr.io/karakeep-app/karakeep:release
+
+# Set container name
+ContainerName=karakeep-web
+
+# Environment variables from environment file
+EnvironmentFile=/etc/karakeep/karakeep.env
+Environment=MEILI_ADDR=http://meilisearch:7700
+Environment=BROWSER_WEB_URL=http://chrome:9222
+Environment=OPENAI_API_KEY=${OPENAI}
+
+# Volumes
+Volume=/var/lib/karakeep/data:/data
+
+# Add to the pod
+Pod=karakeep-pod
+
+# Publish port 3000 to localhost
+PublishPort=127.0.0.1:3000:3000
+
+[Service]
+# Restart policy
+Restart=unless-stopped
+
+[Install]
+WantedBy=karakeep.pod

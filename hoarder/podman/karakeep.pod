@@ -1,0 +1,14 @@
+[Unit]
+Description=Karakeep (Hoarder) pod
+Wants=network-online.target
+After=network-online.target
+
+[Pod]
+# Use a private network for internal communication
+Network=karakeep
+
+# Set pod name
+PodName=karakeep-pod
+
+[Install]
+WantedBy=default.target

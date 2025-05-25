@@ -1,0 +1,17 @@
+[Unit]
+Description=Miniflux pod
+Wants=network-online.target
+After=network-online.target
+
+[Pod]
+# Use a private network for internal communication
+Network=miniflux
+
+# Set pod name
+PodName=miniflux-pod
+
+# Set up environment variables from environment file
+EnvironmentFile=/etc/miniflux/miniflux.env
+
+[Install]
+WantedBy=default.target
