@@ -16,8 +16,8 @@ Environment=MEILI_ADDR=http://meilisearch:7700
 Environment=BROWSER_WEB_URL=http://chrome:9222
 Environment=OPENAI_API_KEY=${OPENAI}
 
-# Volumes
-Volume=/var/lib/karakeep/data:/data
+# Use named volume
+Volume=hoarder_data:/data
 
 # Add to the pod
 Pod=karakeep-pod

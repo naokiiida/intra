@@ -13,8 +13,8 @@ ContainerName=karakeep-meilisearch
 # Environment variables
 Environment=MEILI_NO_ANALYTICS=true
 
-# Volumes
-Volume=/var/lib/meilisearch/data:/meili_data
+# Use named volume
+Volume=hoarder_meilisearch:/meili_data
 
 # Add to the pod
 Pod=karakeep-pod

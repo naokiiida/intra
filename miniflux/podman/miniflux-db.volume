@@ -1,0 +1,13 @@
+[Unit]
+Description=Miniflux PostgreSQL Database Volume
+
+[Volume]
+# Use the existing volume
+VolumeName=miniflux_db
+
+# Optional: Set volume labels
+Label=com.example.maintainer="Miniflux Team"
+Label=com.example.purpose="Database storage for Miniflux"
+
+[Install]
+WantedBy=miniflux.pod

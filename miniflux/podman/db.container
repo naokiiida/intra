@@ -21,8 +21,8 @@ HealthCmd=/usr/bin/pg_isready -U ${PG_USER}
 HealthInterval=10s
 HealthStartupPeriod=30s
 
-# Volumes
-Volume=/var/lib/miniflux/postgres:/var/lib/postgresql/data
+# Use named volume
+Volume=miniflux_db:/var/lib/postgresql/data
 
 # Add to the pod
 Pod=miniflux-pod

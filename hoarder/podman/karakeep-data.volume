@@ -1,0 +1,13 @@
+[Unit]
+Description=Karakeep Application Data Volume
+
+[Volume]
+# Use the existing volume
+VolumeName=hoarder_data
+
+# Optional: Set volume labels
+Label=com.example.maintainer="Karakeep Team"
+Label=com.example.purpose="Application data storage for Karakeep"
+
+[Install]
+WantedBy=karakeep.pod
