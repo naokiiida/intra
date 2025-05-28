@@ -1,5 +1,6 @@
 [Container]
 ContainerName=windmill-lsp
+EnvironmentFile=.env
 ExposeHostPort=3001
 Image=ghcr.io/windmill-labs/windmill-lsp:latest
 Network=windmill.network

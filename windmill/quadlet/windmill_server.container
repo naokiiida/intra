@@ -5,6 +5,7 @@ After=db.service
 [Container]
 ContainerName=windmill-server
 Environment=MODE=server
+EnvironmentFile=.env
 ExposeHostPort=8000
 ExposeHostPort=25
 Image=ghcr.io/windmill-labs/windmill:main

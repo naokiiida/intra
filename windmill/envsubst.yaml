@@ -1,5 +1,5 @@
 services:
-  db:
+  windmill_db:
     container_name: windmill-db
     image: postgres:16
     shm_size: 1g
@@ -17,6 +17,7 @@ services:
       retries: 5
     networks:
       - windmill
+    env_file: .env
 
   windmill_server:
     container_name: windmill-server
@@ -36,6 +37,7 @@ services:
       - worker_logs:/tmp/windmill/logs
     networks:
       - windmill
+    env_file: .env
 
   windmill_worker:
     container_name: windmill-worker
@@ -51,11 +53,12 @@ services:
     # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
     volumes:
       # mount the docker socket to allow to run docker containers from within the workers
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock
       - worker_dependency_cache:/tmp/windmill/cache
       - worker_logs:/tmp/windmill/logs
     networks:
       - windmill
+    env_file: .env
 
   ## This worker is specialized for "native" jobs. Native jobs run in-process and thus are much more lightweight than other jobs
   windmill_worker_native:
@@ -76,6 +79,7 @@ services:
       - worker_logs:/tmp/windmill/logs
     networks:
       - windmill
+    env_file: .env
 
   # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
   # windmill_worker_reports:
@@ -116,8 +120,9 @@ services:
       - worker_logs:/tmp/windmill/logs
     networks:
       - windmill
+    env_file: .env
 
-  lsp:
+  windmill_lsp:
     container_name: windmill-lsp
     image: ghcr.io/windmill-labs/windmill-lsp:latest
     pull_policy: always
@@ -128,6 +133,7 @@ services:
       - lsp_cache:/pyls/.cache
     networks:
       - windmill
+    env_file: .env
 
   # multiplayer:
     # image: ghcr.io/windmill-labs/windmill-multiplayer:latest
