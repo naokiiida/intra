@@ -1,6 +1,6 @@
 [Unit]
-Requires=db.service
-After=db.service
+Requires=windmill-db.service
+After=windmill-db.service
 
 [Container]
 ContainerName=windmill-worker-%i
@@ -8,6 +8,7 @@ Environment=MODE=worker WORKER_GROUP=default
 EnvironmentFile=.env
 Image=ghcr.io/windmill-labs/windmill:main
 Network=windmill.network
+Pod=windmill.pod
 Pull=always
 Volume=/run/user/1000/podman/podman.sock:/var/run/docker.sock
 Volume=worker_dependency_cache:/tmp/windmill/cache

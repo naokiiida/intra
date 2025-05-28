@@ -1,5 +1,4 @@
 [Container]
-ContainerName=windmill-db
 EnvironmentFile=.env
 ExposeHostPort=5432
 HealthCmd=pg_isready -U postgres
@@ -8,6 +7,7 @@ HealthRetries=5
 HealthTimeout=5s
 Image=postgres:16
 Network=windmill.network
+Pod=windmill.pod
 ShmSize=1gb
 Volume=db_data:/var/lib/postgresql/data
 Notify=healthy

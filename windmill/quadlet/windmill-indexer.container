@@ -1,16 +1,16 @@
 [Unit]
-Requires=db.service
-After=db.service
+Requires=windmill-db.service
+After=windmill-db.service
 
 [Container]
-ContainerName=windmill-server
-Environment=MODE=server
+Environment=PORT=8002 MODE=indexer
 EnvironmentFile=.env
-ExposeHostPort=8000
-ExposeHostPort=25
+ExposeHostPort=8002
 Image=ghcr.io/windmill-labs/windmill:main
 Network=windmill.network
+Pod=windmill.pod
 Pull=always
+Volume=index:/tmp/windmill/search
 Volume=worker_logs:/tmp/windmill/logs
 
 [Service]
