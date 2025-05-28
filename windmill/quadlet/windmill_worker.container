@@ -1,0 +1,16 @@
+[Unit]
+Requires=db.service
+After=db.service
+
+[Container]
+ContainerName=windmill-worker
+Environment=MODE=worker WORKER_GROUP=default
+Image=ghcr.io/windmill-labs/windmill:main
+Network=windmill.network
+Pull=always
+Volume=/var/run/docker.sock:/var/run/docker.sock
+Volume=worker_dependency_cache:/tmp/windmill/cache
+Volume=worker_logs:/tmp/windmill/logs
+
+[Service]
+Restart=always

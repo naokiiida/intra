@@ -1,0 +1,10 @@
+[Container]
+ContainerName=windmill-lsp
+ExposeHostPort=3001
+Image=ghcr.io/windmill-labs/windmill-lsp:latest
+Network=windmill.network
+Pull=always
+Volume=lsp_cache:/pyls/.cache
+
+[Service]
+Restart=always

@@ -1,0 +1,15 @@
+[Container]
+ContainerName=windmill-db
+ExposeHostPort=5432
+HealthCmd=pg_isready -U postgres
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+Image=postgres:16
+Network=windmill.network
+ShmSize=1gb
+Volume=db_data:/var/lib/postgresql/data
+Notify=healthy
+
+[Service]
+Restart=always

@@ -1,15 +1,6 @@
-x-logging: &default-logging
-  driver: "json-file"
-  options:
-    max-size: "${LOG_MAX_SIZE:-20m}"
-    max-file: "${LOG_MAX_FILE:-10}"
-    compress: "true"
-
 services:
   db:
-    deploy:
-      # To use an external database, set replicas to 0 and set DATABASE_URL to the external database url in the .env file
-      replicas: 1
+    container_name: windmill-db
     image: postgres:16
     shm_size: 1g
     restart: unless-stopped
@@ -17,22 +8,20 @@ services:
       - db_data:/var/lib/postgresql/data
     expose:
       - 5432
-    ports:
-      - 5432:5432
+    # ports:
+    #   - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-    logging: *default-logging
     networks:
-      - internal
+      - windmill
 
   windmill_server:
+    container_name: windmill-server
     image: ghcr.io/windmill-labs/windmill:main
     pull_policy: always
-    deploy:
-      replicas: 1
     restart: unless-stopped
     expose:
       - 8000
@@ -42,54 +31,38 @@ services:
       - MODE=server
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - worker_logs:/tmp/windmill/logs
-    logging: *default-logging
     networks:
-      - internal
-    labels:
-      - dev.orbstack.domains=windmill.musubie.local
+      - windmill
 
   windmill_worker:
+    container_name: windmill-worker
     image: ghcr.io/windmill-labs/windmill:main
     pull_policy: always
-    deploy:
-      replicas: 3
-      resources:
-        limits:
-          cpus: "1"
-          memory: 2048M
-          # for GB, use syntax '2Gi'
     restart: unless-stopped
     environment:
       - MODE=worker
       - WORKER_GROUP=default
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
     # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
     volumes:
       # mount the docker socket to allow to run docker containers from within the workers
       - /var/run/docker.sock:/var/run/docker.sock
       - worker_dependency_cache:/tmp/windmill/cache
       - worker_logs:/tmp/windmill/logs
-    logging: *default-logging
     networks:
-      - internal
+      - windmill
 
   ## This worker is specialized for "native" jobs. Native jobs run in-process and thus are much more lightweight than other jobs
   windmill_worker_native:
+    container_name: windmill-worker_native
     # Use ghcr.io/windmill-labs/windmill-ee:main for the ee
     image: ghcr.io/windmill-labs/windmill:main
     pull_policy: always
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: "1"
-          memory: 2048M
-          # for GB, use syntax '2Gi'
     restart: unless-stopped
     environment:
       - MODE=worker
@@ -98,31 +71,23 @@ services:
       - SLEEP_QUEUE=200
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - worker_logs:/tmp/windmill/logs
-    logging: *default-logging
     networks:
-      - internal
+      - windmill
 
   # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
   # windmill_worker_reports:
   #   image: ghcr.io/windmill-labs/windmill:main
   #   pull_policy: always
-  #   deploy:
-  #     replicas: 1
-  #     resources:
-  #       limits:
-  #         cpus: "1"
-  #         memory: 2048M
-  #         # for GB, use syntax '2Gi'
   #   restart: unless-stopped
   #   environment:
   #     - MODE=worker
   #     - WORKER_GROUP=reports
   #   depends_on:
   #     db:
-  #       condition: service_healthy
+  #       condition: service_started
   #   # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
   #   volumes:
   #     # mount the docker socket to allow to run docker containers from within the workers
@@ -130,14 +95,13 @@ services:
   #     - worker_dependency_cache:/tmp/windmill/cache
   #     - worker_logs:/tmp/windmill/logs
   #   networks:
-  #     - internal
+  #     - windmill
 
   # The indexer powers full-text job and log search, an EE feature.
   windmill_indexer:
+    container_name: windmill-indexer
     image: ghcr.io/windmill-labs/windmill:main
     pull_policy: always
-    deploy:
-      replicas: 0 # set to 1 to enable full-text job and log search
     restart: unless-stopped
     expose:
       - 8002
@@ -146,15 +110,15 @@ services:
       - MODE=indexer
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - windmill_index:/tmp/windmill/search
       - worker_logs:/tmp/windmill/logs
-    logging: *default-logging
     networks:
-      - internal
+      - windmill
 
   lsp:
+    container_name: windmill-lsp
     image: ghcr.io/windmill-labs/windmill-lsp:latest
     pull_policy: always
     restart: unless-stopped
@@ -162,20 +126,11 @@ services:
       - 3001
     volumes:
       - lsp_cache:/pyls/.cache
-    logging: *default-logging
     networks:
-      - internal
+      - windmill
 
-  multiplayer:
-    image: ghcr.io/windmill-labs/windmill-multiplayer:latest
-    deploy:
-      replicas: 0 # Set to 1 to enable multiplayer, only available on Enterprise Edition
-    restart: unless-stopped
-    expose:
-      - 3002
-    logging: *default-logging
-    networks:
-      - internal
+  # multiplayer:
+    # image: ghcr.io/windmill-labs/windmill-multiplayer:latest
 
   # caddy:
   #   image: ghcr.io/windmill-labs/caddy-l4:latest
@@ -194,18 +149,17 @@ services:
   #     - BASE_URL=":80"
   #     # - BASE_URL=":443" # uncomment and comment line above to enable HTTPS via custom certificate and key files
   #     # - BASE_URL=mydomain.com # Uncomment and comment line above to enable HTTPS handling by Caddy
-  #   logging: *default-logging
   #   networks:
-  #     - internal
+  #     - windmill
 
 networks:
-  internal:
-    name: internal
+  windmill:
+    # name: internal
 
 volumes:
-  db_data: null
-  worker_dependency_cache: null
-  worker_logs: null
-  windmill_index: null
-  lsp_cache: null
-  caddy_data: null
+  db_data:
+  worker_dependency_cache:
+  worker_logs:
+  windmill_index:
+  lsp_cache:
+  caddy_data:
