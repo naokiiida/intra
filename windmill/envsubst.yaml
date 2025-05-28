@@ -2,6 +2,7 @@ name: windmill
 services:
   db:
     image: postgres:16
+    container_name: windmill_db
     shm_size: 1g
     restart: unless-stopped
     volumes:
@@ -21,6 +22,7 @@ services:
 
   server:
     image: ghcr.io/windmill-labs/windmill:main
+    container_name: windmill_server
     pull_policy: always
     restart: unless-stopped
     expose:
@@ -41,6 +43,7 @@ services:
 
   worker:
     image: ghcr.io/windmill-labs/windmill:main
+    container_name: windmill_worker
     pull_policy: always
     restart: unless-stopped
     environment:
@@ -63,6 +66,7 @@ services:
   worker_native:
     # Use ghcr.io/windmill-labs/windmill-ee:main for the ee
     image: ghcr.io/windmill-labs/windmill:main
+    container_name: windmill_worker_native
     pull_policy: always
     restart: unless-stopped
     environment:
@@ -82,6 +86,7 @@ services:
   # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
   # worker_reports:
   #   image: ghcr.io/windmill-labs/windmill:main
+  # container_name: windmill_reports
   #   pull_policy: always
   #   restart: unless-stopped
   #   environment:
@@ -102,6 +107,7 @@ services:
   # The indexer powers full-text job and log search, an EE feature.
   # indexer:
   #   image: ghcr.io/windmill-labs/windmill:main
+  # container_name: windmill_indexer
   #   pull_policy: always
   #   restart: unless-stopped
   #   expose:
@@ -121,6 +127,7 @@ services:
 
   lsp:
     image: ghcr.io/windmill-labs/windmill-lsp:latest
+    container_name: windmill_lsp
     pull_policy: always
     restart: unless-stopped
     expose:
@@ -133,9 +140,11 @@ services:
 
   # multiplayer:
     # image: ghcr.io/windmill-labs/windmill-multiplayer:latest
+    # container_name: windmill_multiplayer
 
   # caddy:
   #   image: ghcr.io/windmill-labs/caddy-l4:latest
+  # container_name: windmill_caddy
   #   restart: unless-stopped
   #   # Configure the mounted Caddyfile and the exposed ports or use another reverse proxy if needed
   #   volumes:

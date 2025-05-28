@@ -1,4 +1,5 @@
 [Container]
+ContainerName=windmill_db
 EnvironmentFile=.env
 ExposeHostPort=5432
 HealthCmd=pg_isready -U postgres

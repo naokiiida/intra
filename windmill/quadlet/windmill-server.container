@@ -3,6 +3,7 @@ Requires=windmill-db.service
 After=windmill-db.service
 
 [Container]
+ContainerName=windmill_server
 Environment=MODE=server
 EnvironmentFile=.env
 ExposeHostPort=8000

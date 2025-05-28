@@ -3,6 +3,7 @@ Requires=windmill-db.service
 After=windmill-db.service
 
 [Container]
+ContainerName=windmill_worker_native
 Environment=MODE=worker WORKER_GROUP=native NUM_WORKERS=8 SLEEP_QUEUE=200
 EnvironmentFile=.env
 Image=ghcr.io/windmill-labs/windmill:main
