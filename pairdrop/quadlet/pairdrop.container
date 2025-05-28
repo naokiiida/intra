@@ -1,0 +1,8 @@
+[Container]
+ContainerName=pairdrop
+Environment=PUID=1000 PGID=1000 WS_FALLBACK=false RATE_LIMIT=false RTC_CONFIG=false DEBUG_MODE=false TZ=Japan
+Image=lscr.io/linuxserver/pairdrop:latest
+PublishPort=127.0.0.1:3000:3000
+
+[Service]
+Restart=always
