@@ -1,1 +1,6 @@
 [Network]
+NetworkName=windmill
+Gateway=10.89.5.1
+Gateway=fd00::1:5:1
+Subnet=10.89.5.0/24
+Subnet=fd00::1:5:0/112

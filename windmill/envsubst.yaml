@@ -165,7 +165,12 @@ services:
 
 networks:
   windmill:
-    # name: internal
+    ipam:
+      config:
+        - subnet: 10.89.5.0/24
+          gateway: 10.89.5.1
+        - subnet: fd00::1:5:0/112
+          gateway: fd00::1:5:1
 
 volumes:
   db_data:
