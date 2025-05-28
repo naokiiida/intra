@@ -100,24 +100,24 @@ services:
   #     - windmill
 
   # The indexer powers full-text job and log search, an EE feature.
-  indexer:
-    image: ghcr.io/windmill-labs/windmill:main
-    pull_policy: always
-    restart: unless-stopped
-    expose:
-      - 8002
-    environment:
-      - PORT=8002
-      - MODE=indexer
-    depends_on:
-      db:
-        condition: service_started
-    volumes:
-      - index:/tmp/windmill/search
-      - worker_logs:/tmp/windmill/logs
-    networks:
-      - windmill
-    env_file: .env
+  # indexer:
+  #   image: ghcr.io/windmill-labs/windmill:main
+  #   pull_policy: always
+  #   restart: unless-stopped
+  #   expose:
+  #     - 8002
+  #   environment:
+  #     - PORT=8002
+  #     - MODE=indexer
+  #   depends_on:
+  #     db:
+  #       condition: service_started
+  #   volumes:
+  #     - index:/tmp/windmill/search
+  #     - worker_logs:/tmp/windmill/logs
+  #   networks:
+  #     - windmill
+  #   env_file: .env
 
   lsp:
     image: ghcr.io/windmill-labs/windmill-lsp:latest
