@@ -1,0 +1,10 @@
+[Container]
+ContainerName=miniflux_db
+Environment=POSTGRES_USER=miniflux POSTGRES_PASSWORD=crpzHTCSQ66KT6Vm POSTGRES_DB=miniflux
+HealthCmd=["pg_isready","-U","miniflux"]
+HealthInterval=10s
+HealthStartPeriod=30s
+Notify=healthy
+Image=postgres:17
+Pod=miniflux.pod
+Volume=miniflux_db:/var/lib/postgresql/data

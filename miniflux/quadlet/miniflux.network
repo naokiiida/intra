@@ -1,0 +1,7 @@
+[Network]
+NetworkName=miniflux
+IPv6=true
+# Gateway=10.89.9.1
+# Gateway=fd00::1:9:1
+# Subnet=10.89.9.0/24
+# Subnet=fd00::1:9:0/112

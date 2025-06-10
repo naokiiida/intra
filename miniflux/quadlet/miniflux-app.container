@@ -1,0 +1,9 @@
+[Unit]
+Requires=miniflux-db.service
+After=miniflux-db.service
+
+[Container]
+ContainerName=miniflux_app
+Environment=DATABASE_URL=postgres://miniflux:crpzHTCSQ66KT6Vm@miniflux_db:5432/miniflux?sslmode=disable RUN_MIGRATIONS=1 CREATE_ADMIN=1 ADMIN_USERNAME=niida ADMIN_PASSWORD=CwG3coQjGoMkssvF BASE_URL=https://feed.taiida.com
+Image=ghcr.io/miniflux/miniflux:latest
+Pod=miniflux.pod
