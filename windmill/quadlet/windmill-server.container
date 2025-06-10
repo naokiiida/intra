@@ -9,7 +9,6 @@ EnvironmentFile=.env
 ExposeHostPort=8000
 ExposeHostPort=25
 Image=ghcr.io/windmill-labs/windmill:main
-Network=windmill.network
 Pod=windmill.pod
 Pull=always
 Volume=worker_logs:/tmp/windmill/logs

@@ -7,7 +7,6 @@ ContainerName=windmill-worker-%i
 Environment=MODE=worker WORKER_GROUP=default
 EnvironmentFile=.env
 Image=ghcr.io/windmill-labs/windmill:main
-Network=windmill.network
 Pod=windmill.pod
 Pull=always
 Volume=/run/user/1000/podman/podman.sock:/var/run/docker.sock

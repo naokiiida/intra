@@ -7,7 +7,6 @@ HealthInterval=10s
 HealthRetries=5
 HealthTimeout=5s
 Image=postgres:16
-Network=windmill.network
 Pod=windmill.pod
 ShmSize=1gb
 Volume=db_data:/var/lib/postgresql/data

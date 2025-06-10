@@ -3,7 +3,6 @@ ContainerName=windmill_lsp
 EnvironmentFile=.env
 ExposeHostPort=3001
 Image=ghcr.io/windmill-labs/windmill-lsp:latest
-Network=windmill.network
 Pod=windmill.pod
 Pull=always
 Volume=lsp_cache:/pyls/.cache
