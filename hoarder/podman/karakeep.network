@@ -1,0 +1,6 @@
+[Network]
+NetworkName=karakeep
+Gateway=10.89.1.1
+Gateway=fd00::1:1:1
+Subnet=10.89.1.0/24
+Subnet=fd00::1:1:0/112

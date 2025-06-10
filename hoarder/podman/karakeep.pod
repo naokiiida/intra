@@ -4,11 +4,9 @@ Wants=network-online.target
 After=network-online.target
 
 [Pod]
-# Use a private network for internal communication
 Network=karakeep
-
-# Set pod name
-PodName=karakeep-pod
+PodName=karakeep
+PublishPort=127.0.0.1:3030:3000
 
 [Install]
 WantedBy=default.target
