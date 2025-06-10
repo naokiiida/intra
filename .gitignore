@@ -2,3 +2,4 @@
 .htpasswd
 .DS_Store
 vaultwarden/config/
+envsubst.yaml
