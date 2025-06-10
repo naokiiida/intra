@@ -1,181 +1,181 @@
 name: windmill
 services:
-  db:
-    image: postgres:16
-    container_name: windmill_db
-    shm_size: 1g
-    restart: unless-stopped
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    expose:
-      - 5432
-    # ports:
-    #   - 5432:5432
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - windmill
-    env_file: .env
+    db:
+        image: postgres:16
+        container_name: windmill_db
+        shm_size: 1g
+        restart: unless-stopped
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        expose:
+            - 5432
+        # ports:
+        #   - 5432:5432
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        networks:
+            - windmill
+        env_file: .env
 
-  server:
-    image: ghcr.io/windmill-labs/windmill:main
-    container_name: windmill_server
-    pull_policy: always
-    restart: unless-stopped
-    expose:
-      - 8000
-      - 25
-    ports:
-      - 127.0.0.1:8888:8000
-    environment:
-      - MODE=server
-    depends_on:
-      db:
-        condition: service_started
-    volumes:
-      - worker_logs:/tmp/windmill/logs
-    networks:
-      - windmill
-    env_file: .env
+    server:
+        image: ghcr.io/windmill-labs/windmill:main
+        container_name: windmill_server
+        pull_policy: always
+        restart: unless-stopped
+        expose:
+            - 8000
+            - 25
+        ports:
+            - 127.0.0.1:8888:8000
+        environment:
+            - MODE=server
+        depends_on:
+            db:
+                condition: service_started
+        volumes:
+            - worker_logs:/tmp/windmill/logs
+        networks:
+            - windmill
+        env_file: .env
 
-  worker:
-    image: ghcr.io/windmill-labs/windmill:main
-    container_name: windmill_worker
-    pull_policy: always
-    restart: unless-stopped
-    environment:
-      - MODE=worker
-      - WORKER_GROUP=default
-    depends_on:
-      db:
-        condition: service_started
-    # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
-    volumes:
-      # mount the docker socket to allow to run docker containers from within the workers
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock
-      - worker_dependency_cache:/tmp/windmill/cache
-      - worker_logs:/tmp/windmill/logs
-    networks:
-      - windmill
-    env_file: .env
+    worker:
+        image: ghcr.io/windmill-labs/windmill:main
+        container_name: windmill_worker
+        pull_policy: always
+        restart: unless-stopped
+        environment:
+            - MODE=worker
+            - WORKER_GROUP=default
+        depends_on:
+            db:
+                condition: service_started
+        # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
+        volumes:
+            # mount the docker socket to allow to run docker containers from within the workers
+            - /run/user/1000/podman/podman.sock:/var/run/docker.sock
+            - worker_dependency_cache:/tmp/windmill/cache
+            - worker_logs:/tmp/windmill/logs
+        networks:
+            - windmill
+        env_file: .env
 
-  ## This worker is specialized for "native" jobs. Native jobs run in-process and thus are much more lightweight than other jobs
-  worker_native:
-    # Use ghcr.io/windmill-labs/windmill-ee:main for the ee
-    image: ghcr.io/windmill-labs/windmill:main
-    container_name: windmill_worker_native
-    pull_policy: always
-    restart: unless-stopped
-    environment:
-      - MODE=worker
-      - WORKER_GROUP=native
-      - NUM_WORKERS=8
-      - SLEEP_QUEUE=200
-    depends_on:
-      db:
-        condition: service_started
-    volumes:
-      - worker_logs:/tmp/windmill/logs
-    networks:
-      - windmill
-    env_file: .env
+    ## This worker is specialized for "native" jobs. Native jobs run in-process and thus are much more lightweight than other jobs
+    worker_native:
+        # Use ghcr.io/windmill-labs/windmill-ee:main for the ee
+        image: ghcr.io/windmill-labs/windmill:main
+        container_name: windmill_worker_native
+        pull_policy: always
+        restart: unless-stopped
+        environment:
+            - MODE=worker
+            - WORKER_GROUP=native
+            - NUM_WORKERS=8
+            - SLEEP_QUEUE=200
+        depends_on:
+            db:
+                condition: service_started
+        volumes:
+            - worker_logs:/tmp/windmill/logs
+        networks:
+            - windmill
+        env_file: .env
 
-  # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
-  # worker_reports:
-  #   image: ghcr.io/windmill-labs/windmill:main
-  # container_name: windmill_reports
-  #   pull_policy: always
-  #   restart: unless-stopped
-  #   environment:
-  #     - MODE=worker
-  #     - WORKER_GROUP=reports
-  #   depends_on:
-  #     db:
-  #       condition: service_started
-  #   # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
-  #   volumes:
-  #     # mount the docker socket to allow to run docker containers from within the workers
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - worker_dependency_cache:/tmp/windmill/cache
-  #     - worker_logs:/tmp/windmill/logs
-  #   networks:
-  #     - windmill
+    # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
+    # worker_reports:
+    #   image: ghcr.io/windmill-labs/windmill:main
+    # container_name: windmill_reports
+    #   pull_policy: always
+    #   restart: unless-stopped
+    #   environment:
+    #     - MODE=worker
+    #     - WORKER_GROUP=reports
+    #   depends_on:
+    #     db:
+    #       condition: service_started
+    #   # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
+    #   volumes:
+    #     # mount the docker socket to allow to run docker containers from within the workers
+    #     - /var/run/docker.sock:/var/run/docker.sock
+    #     - worker_dependency_cache:/tmp/windmill/cache
+    #     - worker_logs:/tmp/windmill/logs
+    #   networks:
+    #     - windmill
 
-  # The indexer powers full-text job and log search, an EE feature.
-  # indexer:
-  #   image: ghcr.io/windmill-labs/windmill:main
-  # container_name: windmill_indexer
-  #   pull_policy: always
-  #   restart: unless-stopped
-  #   expose:
-  #     - 8002
-  #   environment:
-  #     - PORT=8002
-  #     - MODE=indexer
-  #   depends_on:
-  #     db:
-  #       condition: service_started
-  #   volumes:
-  #     - index:/tmp/windmill/search
-  #     - worker_logs:/tmp/windmill/logs
-  #   networks:
-  #     - windmill
-  #   env_file: .env
+    # The indexer powers full-text job and log search, an EE feature.
+    # indexer:
+    #   image: ghcr.io/windmill-labs/windmill:main
+    # container_name: windmill_indexer
+    #   pull_policy: always
+    #   restart: unless-stopped
+    #   expose:
+    #     - 8002
+    #   environment:
+    #     - PORT=8002
+    #     - MODE=indexer
+    #   depends_on:
+    #     db:
+    #       condition: service_started
+    #   volumes:
+    #     - index:/tmp/windmill/search
+    #     - worker_logs:/tmp/windmill/logs
+    #   networks:
+    #     - windmill
+    #   env_file: .env
 
-  lsp:
-    image: ghcr.io/windmill-labs/windmill-lsp:latest
-    container_name: windmill_lsp
-    pull_policy: always
-    restart: unless-stopped
-    expose:
-      - 3001
-    volumes:
-      - lsp_cache:/pyls/.cache
-    networks:
-      - windmill
-    env_file: .env
+    lsp:
+        image: ghcr.io/windmill-labs/windmill-lsp:latest
+        container_name: windmill_lsp
+        pull_policy: always
+        restart: unless-stopped
+        expose:
+            - 3001
+        volumes:
+            - lsp_cache:/pyls/.cache
+        networks:
+            - windmill
+        env_file: .env
 
-  # multiplayer:
+    # multiplayer:
     # image: ghcr.io/windmill-labs/windmill-multiplayer:latest
     # container_name: windmill_multiplayer
 
-  # caddy:
-  #   image: ghcr.io/windmill-labs/caddy-l4:latest
-  # container_name: windmill_caddy
-  #   restart: unless-stopped
-  #   # Configure the mounted Caddyfile and the exposed ports or use another reverse proxy if needed
-  #   volumes:
-  #     - ./Caddyfile:/etc/caddy/Caddyfile
-  #     - caddy_data:/data
-  #     # - ./certs:/certs # Provide custom certificate files like cert.pem and key.pem to enable HTTPS - See the corresponding section in the Caddyfile
-  #   ports:
-  #     # To change the exposed port, simply change 80:80 to <desired_port>:80. No other changes needed
-  #     - 8010:80
-  #     - 25:25
-  #     # - 443:443 # Uncomment to enable HTTPS handling by Caddy
-  #   environment:
-  #     - BASE_URL=":80"
-  #     # - BASE_URL=":443" # uncomment and comment line above to enable HTTPS via custom certificate and key files
-  #     # - BASE_URL=mydomain.com # Uncomment and comment line above to enable HTTPS handling by Caddy
-  #   networks:
-  #     - windmill
+    # caddy:
+    #   image: ghcr.io/windmill-labs/caddy-l4:latest
+    # container_name: windmill_caddy
+    #   restart: unless-stopped
+    #   # Configure the mounted Caddyfile and the exposed ports or use another reverse proxy if needed
+    #   volumes:
+    #     - ./Caddyfile:/etc/caddy/Caddyfile
+    #     - caddy_data:/data
+    #     # - ./certs:/certs # Provide custom certificate files like cert.pem and key.pem to enable HTTPS - See the corresponding section in the Caddyfile
+    #   ports:
+    #     # To change the exposed port, simply change 80:80 to <desired_port>:80. No other changes needed
+    #     - 8010:80
+    #     - 25:25
+    #     # - 443:443 # Uncomment to enable HTTPS handling by Caddy
+    #   environment:
+    #     - BASE_URL=":80"
+    #     # - BASE_URL=":443" # uncomment and comment line above to enable HTTPS via custom certificate and key files
+    #     # - BASE_URL=mydomain.com # Uncomment and comment line above to enable HTTPS handling by Caddy
+    #   networks:
+    #     - windmill
 
 networks:
-  windmill:
-    ipam:
-      config:
-        - subnet: 10.89.5.0/24
-          gateway: 10.89.5.1
-        - subnet: fd00::1:5:0/112
-          gateway: fd00::1:5:1
+    windmill:
+        ipam:
+            config:
+                - subnet: 10.89.5.0/24
+                  gateway: 10.89.5.1
+                - subnet: fd00::1:5:0/112
+                  gateway: fd00::1:5:1
 
 volumes:
-  db_data:
-  worker_dependency_cache:
-  worker_logs:
-  index:
-  lsp_cache:
-  caddy_data:
+    windmill_db_data:
+    windmill_worker_dependency_cache:
+    windmill_worker_logs:
+    windmill_index:
+    windmill_lsp_cache:
+    # caddy_data:
