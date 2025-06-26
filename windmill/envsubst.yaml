@@ -31,6 +31,7 @@ services:
     ports:
       - 127.0.0.1:8888:8000
     environment:
+      - DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable
       - MODE=server
     depends_on:
       db:
@@ -70,6 +71,7 @@ services:
     pull_policy: always
     restart: unless-stopped
     environment:
+      - DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable
       - MODE=worker
       - WORKER_GROUP=native
       - NUM_WORKERS=8
@@ -90,6 +92,7 @@ services:
   #   pull_policy: always
   #   restart: unless-stopped
   #   environment:
+  #     - DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable
   #     - MODE=worker
   #     - WORKER_GROUP=reports
   #   depends_on:

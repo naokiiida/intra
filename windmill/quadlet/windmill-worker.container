@@ -3,15 +3,15 @@ Requires=windmill-db.service
 After=windmill-db.service
 
 [Container]
-ContainerName=windmill_server
-Environment=DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable MODE=server
+ContainerName=windmill_worker
+Environment=MODE=worker WORKER_GROUP=default
 EnvironmentFile=.env
-ExposeHostPort=8000
-ExposeHostPort=25
 Image=ghcr.io/windmill-labs/windmill:main
 Network=windmill.network
 Pod=windmill.pod
 Pull=always
+Volume=/run/user/1000/podman/podman.sock:/var/run/docker.sock
+Volume=worker_dependency_cache:/tmp/windmill/cache
 Volume=worker_logs:/tmp/windmill/logs
 
 [Service]
