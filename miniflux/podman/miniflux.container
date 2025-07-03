@@ -6,6 +6,7 @@ After=miniflux.pod db.container
 [Container]
 # Use the latest Miniflux image
 Image=ghcr.io/miniflux/miniflux:latest
+AutoUpdate=registry
 
 # Set container name
 ContainerName=miniflux
