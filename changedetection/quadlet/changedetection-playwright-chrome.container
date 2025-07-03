@@ -1,0 +1,11 @@
+[Container]
+AddCapability=SYS_ADMIN
+Environment=SCREEN_WIDTH=1920 SCREEN_HEIGHT=1024 SCREEN_DEPTH=16 MAX_CONCURRENT_CHROME_PROCESSES=10
+HostName=playwright-chrome
+Image=docker.io/dgtlmoon/sockpuppetbrowser:latest
+AutoUpdate=registry
+Network=detect.network
+Pod=changedetection.pod
+
+[Service]
+Restart=always

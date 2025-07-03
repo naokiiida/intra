@@ -1,0 +1,16 @@
+[Unit]
+Requires=changedetection-playwright-chrome.service
+After=changedetection-playwright-chrome.service
+
+[Container]
+ContainerName=changedetection
+Environment=PLAYWRIGHT_DRIVER_URL=ws://playwright-chrome:3000 USE_X_SETTINGS=1
+HostName=changedetection
+Image=ghcr.io/dgtlmoon/changedetection.io
+AutoUpdate=registry
+Network=detect.network
+Pod=changedetection.pod
+Volume=changedetection-data:/datastore
+
+[Service]
+Restart=always
