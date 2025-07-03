@@ -1,6 +1,8 @@
+name: karakeep
 services:
   web:
-    image: ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}
+    image: ghcr.io/karakeep-app/karakeep:release
+    # image: ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}
     restart: unless-stopped
     volumes:
       - data:/data
@@ -10,15 +12,17 @@ services:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
       OPENAI_API_KEY: ${OPENAI}
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik_global
-      - traefik.http.routers.karakeep.rule=Host(`${NEXTAUTH_URL}`)
-      - traefik.http.routers.karakeep.service=karakeep
-      - traefik.http.services.karakeep.loadbalancer.server.port=3000
+    ports:
+      - 127.0.0.1:3000:3000
     networks:
-      - traefik_global
       - karakeep
+    #   - traefik_global
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.docker.network=traefik_global
+    #   - traefik.http.routers.karakeep.rule=Host(`${NEXTAUTH_URL}`)
+    #   - traefik.http.routers.karakeep.service=karakeep
+    #   - traefik.http.services.karakeep.loadbalancer.server.port=3000
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:123
     restart: unless-stopped
@@ -47,6 +51,6 @@ volumes:
   meilisearch:
   data:
 networks:
-  traefik_global:
-    external: true
   karakeep:
+  # traefik_global:
+  #   external: true

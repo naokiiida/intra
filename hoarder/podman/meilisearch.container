@@ -6,6 +6,7 @@ After=karakeep.pod
 [Container]
 # Use the Meilisearch image
 Image=getmeili/meilisearch:v1.13.3
+AutoUpdate=registry
 
 # Set container name
 ContainerName=karakeep-meilisearch

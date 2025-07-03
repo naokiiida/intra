@@ -6,6 +6,7 @@ After=karakeep.pod meilisearch.container
 [Container]
 # Use the Karakeep image
 Image=ghcr.io/karakeep-app/karakeep:release
+AutoUpdate=registry
 
 # Set container name
 ContainerName=karakeep-web

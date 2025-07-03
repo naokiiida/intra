@@ -1,0 +1,10 @@
+[Container]
+Environment=MEILI_NO_ANALYTICS=true
+EnvironmentFile=.env
+Image=getmeili/meilisearch:v1.13.3
+Network=karakeep.network
+Pod=karakeep.pod
+Volume=meilisearch:/meili_data
+
+[Service]
+Restart=always

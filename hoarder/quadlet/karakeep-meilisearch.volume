@@ -1,0 +1,13 @@
+[Unit]
+Description=Karakeep Meilisearch Data Volume
+
+[Volume]
+# Use the existing volume
+VolumeName=hoarder_meilisearch
+
+# Optional: Set volume labels
+Label=com.example.maintainer="Karakeep Team"
+Label=com.example.purpose="Search index storage for Karakeep"
+
+[Install]
+WantedBy=karakeep.pod
