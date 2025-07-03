@@ -1,0 +1,16 @@
+[Container]
+AddCapability=CHOWN SETGID SETUID
+ContainerName=searxng
+DropCapability=ALL
+Environment=SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/ UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4} UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}
+Image=docker.io/searxng/searxng:latest
+AutoUpdate=registry
+LogDriver=json-file
+LogOpt=max-size=1m
+LogOpt=max-file=1
+Network=searxng.network
+Pod=searxng.pod
+Volume=./searxng:/etc/searxng
+
+[Service]
+Restart=always
