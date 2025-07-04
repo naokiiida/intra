@@ -1,0 +1,22 @@
+[Unit]
+Description=Postiz - social media scheduling tool
+After=network-online.target
+StartLimitIntervalSec=30
+StartLimitBurst=2
+
+[Install]
+WantedBy=default.target
+
+[Container]
+AutoUpdate=registry
+ContainerName=postiz
+Image=ghcr.io/gitroomhq/postiz-app:latest
+Network=postiz-network.network
+Pod=postiz.pod
+Volume=/etc/postiz/:/config/
+Volume=postiz-uploads:/uploads/
+Environment=TZ=Japan
+EnvironmentFile=/etc/postiz/postiz.env
+
+[Service]
+Restart=always
