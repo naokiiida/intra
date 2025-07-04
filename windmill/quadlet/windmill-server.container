@@ -4,7 +4,7 @@ After=windmill-db.service
 
 [Container]
 ContainerName=windmill_server
-Environment=MODE=server
+Environment=DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable MODE=server
 EnvironmentFile=.env
 ExposeHostPort=8000
 ExposeHostPort=25

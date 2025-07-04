@@ -20,26 +20,27 @@ services:
             - windmill
         env_file: .env
 
-    server:
-        image: ghcr.io/windmill-labs/windmill:main
-        container_name: windmill_server
-        pull_policy: always
-        restart: unless-stopped
-        expose:
-            - 8000
-            - 25
-        ports:
-            - 127.0.0.1:8888:8000
-        environment:
-            - MODE=server
-        depends_on:
-            db:
-                condition: service_started
-        volumes:
-            - worker_logs:/tmp/windmill/logs
-        networks:
-            - windmill
-        env_file: .env
+  server:
+    image: ghcr.io/windmill-labs/windmill:main
+    container_name: windmill_server
+    pull_policy: always
+    restart: unless-stopped
+    expose:
+      - 8000
+      - 25
+    ports:
+      - 127.0.0.1:8888:8000
+    environment:
+      - DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable
+      - MODE=server
+    depends_on:
+      db:
+        condition: service_started
+    volumes:
+      - worker_logs:/tmp/windmill/logs
+    networks:
+      - windmill
+    env_file: .env
 
     worker:
         image: ghcr.io/windmill-labs/windmill:main
@@ -62,47 +63,49 @@ services:
             - windmill
         env_file: .env
 
-    ## This worker is specialized for "native" jobs. Native jobs run in-process and thus are much more lightweight than other jobs
-    worker_native:
-        # Use ghcr.io/windmill-labs/windmill-ee:main for the ee
-        image: ghcr.io/windmill-labs/windmill:main
-        container_name: windmill_worker_native
-        pull_policy: always
-        restart: unless-stopped
-        environment:
-            - MODE=worker
-            - WORKER_GROUP=native
-            - NUM_WORKERS=8
-            - SLEEP_QUEUE=200
-        depends_on:
-            db:
-                condition: service_started
-        volumes:
-            - worker_logs:/tmp/windmill/logs
-        networks:
-            - windmill
-        env_file: .env
+  ## This worker is specialized for "native" jobs. Native jobs run in-process and thus are much more lightweight than other jobs
+  worker_native:
+    # Use ghcr.io/windmill-labs/windmill-ee:main for the ee
+    image: ghcr.io/windmill-labs/windmill:main
+    container_name: windmill_worker_native
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable
+      - MODE=worker
+      - WORKER_GROUP=native
+      - NUM_WORKERS=8
+      - SLEEP_QUEUE=200
+    depends_on:
+      db:
+        condition: service_started
+    volumes:
+      - worker_logs:/tmp/windmill/logs
+    networks:
+      - windmill
+    env_file: .env
 
-    # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
-    # worker_reports:
-    #   image: ghcr.io/windmill-labs/windmill:main
-    # container_name: windmill_reports
-    #   pull_policy: always
-    #   restart: unless-stopped
-    #   environment:
-    #     - MODE=worker
-    #     - WORKER_GROUP=reports
-    #   depends_on:
-    #     db:
-    #       condition: service_started
-    #   # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
-    #   volumes:
-    #     # mount the docker socket to allow to run docker containers from within the workers
-    #     - /var/run/docker.sock:/var/run/docker.sock
-    #     - worker_dependency_cache:/tmp/windmill/cache
-    #     - worker_logs:/tmp/windmill/logs
-    #   networks:
-    #     - windmill
+  # This worker is specialized for reports or scraping jobs. It is assigned the "reports" worker group which has an init script that installs chromium and can be targeted by using the "chromium" worker tag.
+  # worker_reports:
+  #   image: ghcr.io/windmill-labs/windmill:main
+  # container_name: windmill_reports
+  #   pull_policy: always
+  #   restart: unless-stopped
+  #   environment:
+  #     - DATABASE_URL=postgres://postgres:changeme@db:5432/windmill?sslmode=disable
+  #     - MODE=worker
+  #     - WORKER_GROUP=reports
+  #   depends_on:
+  #     db:
+  #       condition: service_started
+  #   # to mount the worker folder to debug, KEEP_JOB_DIR=true and mount /tmp/windmill
+  #   volumes:
+  #     # mount the docker socket to allow to run docker containers from within the workers
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - worker_dependency_cache:/tmp/windmill/cache
+  #     - worker_logs:/tmp/windmill/logs
+  #   networks:
+  #     - windmill
 
     # The indexer powers full-text job and log search, an EE feature.
     # indexer:

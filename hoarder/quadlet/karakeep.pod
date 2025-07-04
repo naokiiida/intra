@@ -1,0 +1,15 @@
+[Unit]
+Description=Karakeep (Hoarder) pod
+Wants=network-online.target
+After=network-online.target
+
+[Pod]
+PublishPort=127.0.0.1:3000:3000
+# Use a private network for internal communication
+Network=karakeep
+
+# Set pod name
+PodName=karakeep-pod
+
+[Install]
+WantedBy=default.target

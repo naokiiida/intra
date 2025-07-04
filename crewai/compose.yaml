@@ -1,0 +1,12 @@
+services:
+  crewai-studio:
+    image: tham0nk/crewai-studio
+    ports:
+      - "8501:8501"
+    volumes:
+      - crewai-studio:/app
+    labels:
+      - dev.orbstack.domains=crew.local
+volumes:
+  crewai-studio:
+ 

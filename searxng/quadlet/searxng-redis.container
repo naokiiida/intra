@@ -1,0 +1,16 @@
+[Container]
+AddCapability=SETGID SETUID DAC_OVERRIDE
+ContainerName=redis
+DropCapability=ALL
+Exec=valkey-server --save 30 1 --loglevel warning
+Image=docker.io/valkey/valkey:8-alpine
+AutoUpdate=registry
+LogDriver=json-file
+LogOpt=max-size=1m
+LogOpt=max-file=1
+Network=searxng.network
+Pod=searxng.pod
+Volume=valkey-data2:/data
+
+[Service]
+Restart=always

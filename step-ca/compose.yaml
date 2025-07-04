@@ -9,6 +9,8 @@ services:
       - DOCKER_STEPCA_INIT_NAME=${NAME}
       - DOCKER_STEPCA_INIT_DNS_NAMES=${STEP_HOST}
       - DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT=true
+      - DOCKER_STEPCA_INIT_SSH=true
+      - DOCKER_STEPCA_INIT_ACME=true
       - TZ=Japan
     volumes:
       - step:/home/step
@@ -16,7 +18,11 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik_global
       - traefik.http.routers.step-ca.rule=Host(`${STEP_HOST}`)
+      - traefik.http.routers.step-ca.service=step-ca
       - traefik.http.services.step-ca.loadbalancer.server.port=9000
+      # - "traefik.http.routers.step-ca.tls.certresolver="
+      # - "traefik.http.routers.step-ca.tls.certificates[0].certFile=/home/step/certs/root_ca.crt"
+      # - "traefik.http.routers.step-ca.tls.certificates[0].keyFile=/home/step/secrets/root_ca_key"
 
 volumes:
   step:

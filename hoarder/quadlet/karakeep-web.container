@@ -1,0 +1,10 @@
+[Container]
+Environment=MEILI_ADDR=http://meilisearch:7700 BROWSER_WEB_URL=http://chrome:9222 OPENAI_API_KEY=${OPENAI}
+EnvironmentFile=.env
+Image=ghcr.io/karakeep-app/karakeep:release
+Network=karakeep.network
+Pod=karakeep.pod
+Volume=data:/data
+
+[Service]
+Restart=always

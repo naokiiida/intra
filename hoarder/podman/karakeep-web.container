@@ -5,6 +5,9 @@ After=meilisearch.container
 
 [Container]
 Image=ghcr.io/karakeep-app/karakeep:release
+AutoUpdate=registry
+
+# Set container name
 ContainerName=karakeep-web
 
 EnvironmentFile=/etc/karakeep/karakeep.env

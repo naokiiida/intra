@@ -1,0 +1,13 @@
+[Container]
+ContainerName=postiz-redis
+HealthCmd=redis-cli ping
+HealthInterval=10s
+HealthRetries=3
+HealthTimeout=3s
+Image=docker.io/redis:7.2
+Network=postiz-network.network
+Pod=postiz.pod
+Volume=postiz-redis-data:/data
+
+[Service]
+Restart=always

@@ -1,3 +1,4 @@
+name: changedetection
 services:
   changedetection:
     image: ghcr.io/dgtlmoon/changedetection.io
@@ -12,14 +13,16 @@ services:
     depends_on:
         playwright-chrome:
             condition: service_started
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik_global
-      - traefik.http.routers.crawl.rule=Host(`crawl.taiida.com`)
-      - traefik.http.services.crawl.loadbalancer.server.port=5000
+    ports:
+      - "127.0.0.1:5000:5000"    
     networks:
       - detect
-      - traefik_global
+      # - traefik_global
+    # labels:
+      # - traefik.enable=true
+      # - traefik.docker.network=traefik_global
+      # - traefik.http.routers.crawl.rule=Host(`crawl.taiida.com`)
+      # - traefik.http.services.crawl.loadbalancer.server.port=5000
 
   playwright-chrome:
     hostname: playwright-chrome
@@ -39,6 +42,6 @@ volumes:
   changedetection-data:
 
 networks:
-  traefik_global:
-    external: true
+  # traefik_global:
+  #   external: true
   detect:
